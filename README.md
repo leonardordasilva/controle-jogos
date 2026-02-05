@@ -8,6 +8,7 @@ Aplicação web desenvolvida com Hono e Cloudflare Pages para controlar e organi
 
 ## 🌐 URLs
 
+- **GitHub**: https://github.com/leonardordasilva/controle-jogos
 - **Produção (Sandbox)**: https://3000-ili91fs3mttuv9obbng3u-18e660f9.sandbox.novita.ai
 - **API Base**: https://3000-ili91fs3mttuv9obbng3u-18e660f9.sandbox.novita.ai/api/games
 
