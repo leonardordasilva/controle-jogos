@@ -514,7 +514,7 @@ app.get('/', (c) => {
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="deleteGame(\${game.id}, '\${game.name.replace(/'/g, "\\'")}'))" 
+                                    <button onclick="deleteGame(\${game.id}, '\${game.name.replace(/'/g, "\\'")}');" 
                                         class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition">
                                         <i class="fas fa-trash"></i>
                                     </button>
