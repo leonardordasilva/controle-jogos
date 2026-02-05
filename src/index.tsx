@@ -165,6 +165,108 @@ app.get('/', (c) => {
             select option:hover {
                 background-color: #334155;
             }
+
+            /* Toast Notifications */
+            .toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                min-width: 300px;
+                padding: 16px 20px;
+                border-radius: 12px;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease-out;
+                z-index: 9999;
+                backdrop-filter: blur(10px);
+            }
+
+            .toast.success {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                border: 2px solid rgba(255,255,255,0.3);
+            }
+
+            .toast.error {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                border: 2px solid rgba(255,255,255,0.3);
+            }
+
+            .toast.info {
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                border: 2px solid rgba(255,255,255,0.3);
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(400px);
+                    opacity: 0;
+                }
+            }
+
+            .toast.hide {
+                animation: slideOut 0.3s ease-in;
+            }
+
+            /* Modal de Confirmação */
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                backdrop-filter: blur(5px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                animation: fadeIn 0.2s ease-out;
+            }
+
+            .modal-content {
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid rgba(255,255,255,0.1);
+                border-radius: 16px;
+                padding: 32px;
+                max-width: 450px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                animation: scaleIn 0.3s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes scaleIn {
+                from { 
+                    transform: scale(0.9);
+                    opacity: 0;
+                }
+                to { 
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
         </style>
     </head>
     <body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
@@ -280,10 +382,38 @@ app.get('/', (c) => {
             </div>
         </div>
 
+        <!-- Toast Notifications Container -->
+        <div id="toastContainer"></div>
+
+        <!-- Modal de Confirmação de Exclusão -->
+        <div id="deleteModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
+                        <i class="fas fa-trash-alt text-red-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Excluir Jogo?</h3>
+                    <p class="text-gray-300" id="deleteGameName">Tem certeza que deseja excluir este jogo?</p>
+                    <p class="text-gray-400 text-sm mt-2">Esta ação não pode ser desfeita.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button id="cancelDelete" 
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </button>
+                    <button id="confirmDelete" 
+                        class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition">
+                        <i class="fas fa-trash mr-2"></i>Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script>
             const API_URL = '/api/games';
             let editingId = null;
+            let gameToDelete = null;
 
             // Status colors
             const statusColors = {
@@ -292,6 +422,55 @@ app.get('/', (c) => {
                 'Zerado': 'bg-green-500',
                 'Casual': 'bg-purple-500'
             };
+
+            // Toast Notification Function
+            function showToast(message, type = 'success') {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast ' + type;
+                
+                const icon = type === 'success' ? 'fa-check-circle' : 
+                            type === 'error' ? 'fa-exclamation-circle' : 
+                            'fa-info-circle';
+                
+                toast.innerHTML = '<i class="fas ' + icon + ' text-2xl"></i><span class="font-semibold">' + message + '</span>';
+                
+                toastContainer.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // Modal Functions
+            function showDeleteModal(gameId, gameName) {
+                gameToDelete = gameId;
+                document.getElementById('deleteGameName').textContent = 'Deseja excluir "' + gameName + '"?';
+                document.getElementById('deleteModal').style.display = 'flex';
+            }
+
+            function hideDeleteModal() {
+                gameToDelete = null;
+                document.getElementById('deleteModal').style.display = 'none';
+            }
+
+            // Modal Event Listeners
+            document.getElementById('cancelDelete').addEventListener('click', hideDeleteModal);
+            
+            document.getElementById('confirmDelete').addEventListener('click', async () => {
+                if (gameToDelete) {
+                    await performDelete(gameToDelete);
+                    hideDeleteModal();
+                }
+            });
+
+            // Close modal on overlay click
+            document.getElementById('deleteModal').addEventListener('click', (e) => {
+                if (e.target.id === 'deleteModal') {
+                    hideDeleteModal();
+                }
+            });
 
             // Load games
             async function loadGames(filters = {}) {
@@ -335,7 +514,7 @@ app.get('/', (c) => {
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg transition">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button onclick="deleteGame(\${game.id})" 
+                                    <button onclick="deleteGame(\${game.id}, '\${game.name.replace(/'/g, "\\'")}'))" 
                                         class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -345,7 +524,7 @@ app.get('/', (c) => {
                     \`).join('');
                 } catch (error) {
                     console.error('Error loading games:', error);
-                    alert('Erro ao carregar jogos');
+                    showToast('Erro ao carregar jogos', 'error');
                 }
             }
 
@@ -362,16 +541,18 @@ app.get('/', (c) => {
                     if (id) {
                         // Update
                         await axios.put(\`\${API_URL}/\${id}\`, { name, platform, status });
+                        showToast('Jogo atualizado com sucesso!', 'success');
                     } else {
                         // Create
                         await axios.post(API_URL, { name, platform, status });
+                        showToast('Jogo adicionado com sucesso!', 'success');
                     }
 
                     resetForm();
                     loadGames(getCurrentFilters());
                 } catch (error) {
                     console.error('Error saving game:', error);
-                    alert('Erro ao salvar jogo');
+                    showToast('Erro ao salvar jogo', 'error');
                 }
             });
 
@@ -393,20 +574,24 @@ app.get('/', (c) => {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } catch (error) {
                     console.error('Error loading game:', error);
-                    alert('Erro ao carregar jogo');
+                    showToast('Erro ao carregar jogo', 'error');
                 }
             }
 
-            // Delete game
-            async function deleteGame(id) {
-                if (!confirm('Tem certeza que deseja excluir este jogo?')) return;
+            // Delete game - Show modal
+            async function deleteGame(id, name) {
+                showDeleteModal(id, name);
+            }
 
+            // Perform delete
+            async function performDelete(id) {
                 try {
                     await axios.delete(\`\${API_URL}/\${id}\`);
+                    showToast('Jogo excluído com sucesso!', 'success');
                     loadGames(getCurrentFilters());
                 } catch (error) {
                     console.error('Error deleting game:', error);
-                    alert('Erro ao excluir jogo');
+                    showToast('Erro ao excluir jogo', 'error');
                 }
             }
 
