@@ -154,6 +154,18 @@ app.get('/', (c) => {
         <title>Controle de Jogos</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            /* Fix para dropdown de select - options visíveis com fundo escuro */
+            select option {
+                background-color: #1e293b;
+                color: white;
+                padding: 8px;
+            }
+            
+            select option:hover {
+                background-color: #334155;
+            }
+        </style>
     </head>
     <body class="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 min-h-screen">
         <div class="container mx-auto px-4 py-8">
