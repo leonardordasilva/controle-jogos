@@ -11,6 +11,23 @@ Aplicação web desenvolvida com Hono e Cloudflare Pages para controlar e organi
 - **Produção (Sandbox)**: https://3000-ili91fs3mttuv9obbng3u-18e660f9.sandbox.novita.ai
 - **API Base**: https://3000-ili91fs3mttuv9obbng3u-18e660f9.sandbox.novita.ai/api/games
 
+## 📊 Estatísticas da Coleção
+
+**Total de Jogos**: 228 jogos importados
+
+**Por Status:**
+- 🟢 **Zerados**: 48 jogos
+- 🟡 **A Jogar**: 117 jogos
+- 🔵 **Jogando**: 1 jogo
+- 🟣 **Casual**: 62 jogos
+
+**Principais Plataformas:**
+- Nintendo Wii (maioria)
+- Nintendo Switch (28 jogos)
+- PC (vários jogos modernos)
+- PlayStation 4 (série Kingdom Hearts)
+- Xbox (alguns títulos)
+
 ## ✨ Funcionalidades
 
 ### ✅ Funcionalidades Implementadas
